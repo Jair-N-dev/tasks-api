@@ -191,3 +191,56 @@ def estadisticas_generales(db: Session = Depends(get_db)):
         "total_members": 0,  # Lo calcularemos después
         "total_tasks": 0     # Lo calcularemos después
     }
+    
+# GET - Obtener miembros de un equipo
+@router.get("/{team_id}/members")
+def obtener_miembros_team(team_id: int, db: Session = Depends(get_db)):
+    """
+    Obtener la lista de miembros de un equipo.
+    """
+    from app.models.user import User
+    from app.models.user_team import UserTeam
+    
+    team = db.query(Team).filter(Team.id == team_id).first()
+    
+    if not team:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Equipo con ID {team_id} no encontrado"
+        )
+    
+    # Query manual con JOIN
+    members_data = db.query(
+        User.id,
+        User.nombre,
+        User.email,
+        User.activo,
+        UserTeam.role,
+        UserTeam.joined_at
+    ).join(
+        UserTeam, UserTeam.user_id == User.id
+    ).filter(
+        UserTeam.team_id == team_id
+    ).all()
+    
+    members = [
+        {
+            "user_id": m.id,
+            "nombre": m.nombre,
+            "email": m.email,
+            "activo": m.activo,
+            "role": m.role,
+            "joined_at": m.joined_at
+        }
+        for m in members_data
+    ]
+    
+    return {
+        "team": {
+            "id": team.id,
+            "nombre": team.nombre,
+            "descripcion": team.descripcion
+        },
+        "members": members,
+        "total_members": len(members)
+    }
