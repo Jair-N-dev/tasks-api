@@ -6,12 +6,13 @@ from app.database import engine, Base
 from app.models.team import Team
 from app.models.user import User
 from app.models.user_team import UserTeam
+from app.models.task import Task
 
 # Crear tablas
 Base.metadata.create_all(bind=engine)
 
 # Importar routers
-from app.routers import teams, users
+from app.routers import teams, users, tasks
 
 app = FastAPI(
     title="Tasks API",
@@ -37,6 +38,7 @@ def root():
         "endpoints": {
             "teams": "/teams",
             "users": "/users",
+            "tasks": "/tasks",
             "docs": "/docs",
             "health": "/health"
         }
@@ -49,3 +51,4 @@ def health_check():
 # Registrar routers
 app.include_router(teams.router)
 app.include_router(users.router)
+app.include_router(tasks.router)
