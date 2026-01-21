@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 
-# Importar TODOS los modelos
+# Importar modelos
 from app.models.team import Team
 from app.models.user import User
 from app.models.user_team import UserTeam
@@ -14,10 +14,32 @@ Base.metadata.create_all(bind=engine)
 # Importar routers
 from app.routers import teams, users, tasks
 
+# Metadata mejorada
 app = FastAPI(
     title="Tasks API",
-    description="Sistema de gestión de tareas en equipo",
-    version="1.0.0"
+    description="""
+    🚀 **Sistema completo de gestión de tareas en equipo**
+    
+    ## Características principales
+    
+    * **Teams**: Gestión de equipos de trabajo
+    * **Users**: Administración de usuarios
+    * **Tasks**: Sistema completo de tareas con estados y prioridades
+    * **Relationships**: Relaciones muchos a muchos entre usuarios y equipos
+    
+    ## Autor
+    
+    Desarrollado por **[Jair]** - [GitHub](https://github.com/Jair-N-dev)
+    """,
+    version="1.0.0",
+    contact={
+        "name": "Jair",
+        "url": "https://github.com/Jair-N-dev/tasks-api"
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
 )
 
 # CORS
@@ -29,8 +51,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 def root():
+    """
+    # 🏠 Bienvenido a Tasks API
+    
+    Sistema de gestión de tareas en equipo con FastAPI y MySQL.
+    
+    ## 📚 Recursos disponibles:
+    - **Teams**: `/teams/` - Gestión de equipos
+    - **Users**: `/users/` - Gestión de usuarios  
+    - **Tasks**: `/tasks/` - Gestión de tareas
+    
+    ## 📖 Documentación:
+    - **Swagger UI**: `/docs` (esta página)
+    - **ReDoc**: `/redoc`
+    
+    ## ✨ Features:
+    - Autenticación por roles
+    - Filtros avanzados
+    - Búsqueda full-text
+    - Estadísticas en tiempo real
+    """
     return {
         "message": "Tasks API - Sistema de gestión de tareas",
         "version": "1.0.0",
@@ -44,9 +86,18 @@ def root():
         }
     }
 
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "healthy", "database": "connected"}
+    """
+    🏥 Health check endpoint
+    
+    Verifica que la API y la base de datos estén funcionando correctamente.
+    """
+    return {
+        "status": "healthy",
+        "database": "connected",
+        "version": "1.0.0"
+    }
 
 # Registrar routers
 app.include_router(teams.router)
